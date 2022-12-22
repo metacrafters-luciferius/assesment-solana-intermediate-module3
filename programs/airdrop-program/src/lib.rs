@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, Token, TokenAccount, MintTo};
+use anchor_spl::{token::{Mint, Token, TokenAccount, MintTo}, associated_token::AssociatedToken};
 
 declare_id!("E2cw8j1gqrMeF7k4xvncmRRRtM2Zb2Evbfq8t6bw5cKT");
 
@@ -67,15 +67,16 @@ pub struct Airdrop<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
     #[account(
-        init,
-        token::mint = token_mint,
-        token::authority = user,
-        payer = user
+        init_if_needed,
+        payer = user,
+        associated_token::mint = token_mint,
+        associated_token::authority = user,
     )]
     pub user_token_account: Account<'info, TokenAccount>,
     pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 impl <'info> Airdrop<'info> {
